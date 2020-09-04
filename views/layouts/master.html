@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{{.title}}</title>
+	<meta charset="UTF-8" />
+	<meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
+	{{template "head" .}}
+	<style type="text/css">
+		.copyleft {
+		  display: inline-block;
+		  -moz-transform: scale(-1, 1);
+		  -webkit-transform: scale(-1, 1);
+		  -o-transform: scale(-1, 1);
+		  -ms-transform: scale(-1, 1);
+		  transform: scale(-1, 1);
+		}
+	</style>
+</head>
+<body>
+	{{template "content" .}}
+
+	{{include "layouts/footer"}}
+</body>
+</html>

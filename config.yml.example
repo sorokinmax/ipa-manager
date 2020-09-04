@@ -1,0 +1,8 @@
+# Service parameters
+service:
+  port: 80
+  url: "http://localhost" # Specify the port via ":" in the url if it is non-standard. Based on this address, links are formed in db and plist.
+  
+# Configurations
+paths:
+  distrs: "\\\\share\\ipas"

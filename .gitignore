@@ -13,3 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+.vscode/launch.json
+config.yml
+images/full-size-image-orig.png
+images/display-image-orig.png
+ipa-manager.7z
+ipa.db
+ipa
+output.log
+web.log
