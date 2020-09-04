@@ -1,7 +1,7 @@
 # IPA-Manager
  
 ### Description
-IPA Manager was created to simplify the transfer and installation of mobile client builds for iOS.
+Web-tool for simplify the handing over IPA applications to testers and installation of builds for iOS.
 
 ### How it works
 IPA Manager monitors the "\\share\ipas" directory to see if files with the ".ipa " extension appear in it. When such a file appears, it copies it to itself, parses the Info.plist of the application, and adds the collected information to its database and forms a plist for subsequent installation of the IPA. Then deletes the source file from the \\share\ipas directory.
