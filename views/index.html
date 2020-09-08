@@ -25,7 +25,7 @@
         margin: 4px 2px;
         cursor: pointer;
         width: 100%;
-        border-radius: 8px;
+        //border-radius: 8px;
     }
     .button-red {background-color: #f44336;}
     .button-yelow {background-color: #FFD54F;}
@@ -53,12 +53,12 @@
           </tr>
         {{range .ipas}}
         <tr>
-            <td>{{.ID}}
+            <td>{{.ID}}</td>
             <td><a href={{.URL}}>{{.URL}}</a></td>
             <td>{{.CFBundleIdentifier}}</td>
             <td>{{.CFBundleName}}</td>
             <td>{{.CFBundleDisplayName}}</td>
-            <td>{{.CFBundleVersion}}</td>
+            <td><a href=/{{.CFBundleVersion}}>{{.CFBundleVersion}}</a></td>
             <td>{{.CFBundleShortVersionString}}</td>
             <td>{{.DateTime}}</td>
             <td>

@@ -18,7 +18,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.1.3.0"
+const version = "v.1.4.0"
 
 var cfg Config
 
@@ -60,6 +60,7 @@ func main() {
 	router.Use(static.Serve("/ipa", static.LocalFile("./ipa", false)))
 	router.Use(static.Serve("/images", static.LocalFile("./images", false)))
 	router.GET("/", indexHandler)
+	router.GET("/:version/", versionHandler)
 	router.POST("/action/qr", qrHandler)
 	router.POST("/action/remove", removeHandler)
 

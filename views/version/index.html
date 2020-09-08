@@ -1,0 +1,73 @@
+{{define "head"}}
+<style>
+    hr{ border: 1px #ccc dashed;}
+    table{
+        text-align:center; 
+        width:70%;
+        margin-left:auto; 
+        margin-right:auto;
+        border: 1px solid black;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+    .button {
+        background-color: #4CAF50;
+        border: none;
+        color: black;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 4px 2px;
+        cursor: pointer;
+        width: 100%;
+        //border-radius: 8px;
+    }
+    .button-red {background-color: #f44336;}
+    .button-yelow {background-color: #FFD54F;}
+</style>
+{{end}}
+
+{{define "content"}}
+<h1>IPA Manager</h1>
+<hr>
+
+<table cellpadding="1" cellspacing="1" >
+    <tbody>
+        <tr>
+            <th>ID</th>
+            <th>URL</th>
+            <th>Bundle Identifier</th>
+            <th>Bundle Name</th>
+            <th>Bundle Display Name</th>
+            <th>Bundle Version</th>
+            <th>Bundle Short Version</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        <tr>
+            <td>{{.ipa.ID}}</td>
+            <td><a href={{.ipa.URL}}>{{.ipa.URL}}</a></td>
+            <td>{{.ipa.CFBundleIdentifier}}</td>
+            <td>{{.ipa.CFBundleName}}</td>
+            <td>{{.ipa.CFBundleDisplayName}}</td>
+            <td>{{.ipa.CFBundleVersion}}</td>
+            <td>{{.ipa.CFBundleShortVersionString}}</td>
+            <td>{{.ipa.DateTime}}</td>
+            <td>
+                <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist'">Install IPA</button>
+                <form id="qr-form{{.ipa.ID}}" action="/action/qr" enctype="application/x-www-form-urlencoded" method="post">
+                    <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist">
+                    <input type="hidden" name="version" value="{{.ipa.CFBundleVersion}}">
+                </form>
+                <button class="button" type="submit" form="qr-form{{.ipa.ID}}" value="qr">Get QR</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<hr>
+{{end}}

@@ -59,7 +59,6 @@ func SQLiteSaveIpa(ipa Ipa) error {
 	return nil
 }
 
-// SQLiteGetIpa create/magrate DB
 func SQLiteGetIpa(id string) (Ipa, error) {
 
 	db, err := gorm.Open("sqlite3", "./ipa.db")
@@ -75,7 +74,21 @@ func SQLiteGetIpa(id string) (Ipa, error) {
 	return ipa, nil
 }
 
-// SQLiteGetIpa create/magrate DB
+func SQLiteFindIpa(version string) (Ipa, error) {
+
+	db, err := gorm.Open("sqlite3", "./ipa.db")
+	if err != nil {
+		panic("Failed to open the SQLite database.")
+	}
+	defer db.Close()
+
+	// Find all of our users.
+	var ipa Ipa
+	db.Where("cf_bundle_version = ?", version).Find(&ipa)
+
+	return ipa, nil
+}
+
 func SQLiteGetIpas() ([]Ipa, error) {
 
 	db, err := gorm.Open("sqlite3", "./ipa.db")

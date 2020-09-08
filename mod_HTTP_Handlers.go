@@ -48,6 +48,20 @@ func removeHandler(ctx *gin.Context) {
 	log.Println("Ipa delete has completed")
 }
 
+func versionHandler(ctx *gin.Context) {
+	var ipa Ipa
+	var ver = ctx.Param("version")
+	ipa, _ = SQLiteFindIpa(ver)
+
+	ctx.HTML(http.StatusOK, "version/index", gin.H{
+		"title":       "IPA Manager",
+		"version":     version,
+		"ipa":         ipa,
+		"service_url": cfg.Service.Url,
+	},
+	)
+}
+
 func qrHandler(ctx *gin.Context) {
 	dataString := ctx.PostForm("url")
 	version := ctx.PostForm("version")
