@@ -24,7 +24,7 @@ func deleteFile(path string) {
 func filesEnum(path string) []string {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	var fileNames []string
 	for _, file := range files {
