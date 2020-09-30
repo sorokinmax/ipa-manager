@@ -8,8 +8,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const bmExcludePathsFile = "BMexclude.txt"
-
 // Config struct
 type Config struct {
 	Service struct {
