@@ -20,7 +20,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.1.5.0"
+const version = "v.2.0.0"
 
 var (
 	cfg         Config
