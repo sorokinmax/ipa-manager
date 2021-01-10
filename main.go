@@ -18,7 +18,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.1.4.2"
+const version = "v.1.4.3"
 
 var cfg Config
 
