@@ -38,6 +38,19 @@ func indexHandler(ctx *gin.Context) {
 	)
 }
 
+func adminHandler(ctx *gin.Context) {
+	var ipas []Ipa
+	ipas, _ = SQLiteGetIpas()
+
+	ctx.HTML(http.StatusOK, "admin", gin.H{
+		"title":       "IPA Manager",
+		"version":     version,
+		"ipas":        ipas,
+		"service_url": cfg.Service.Url,
+	},
+	)
+}
+
 func removeHandler(ctx *gin.Context) {
 	var ipa Ipa
 	var id = ctx.PostForm("id")
