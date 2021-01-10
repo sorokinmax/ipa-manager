@@ -1,0 +1,3 @@
+p, index_admin, index, read
+p, index_admin, index, write
+g, DESKTOP-PC\Admin, index_admin

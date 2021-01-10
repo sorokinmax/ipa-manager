@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/casbin/casbin"
 	"github.com/gin-gonic/gin"
 
 	"github.com/boombuler/barcode"
@@ -28,24 +29,28 @@ func handlerCustomError(c *gin.Context, err string) {
 func indexHandler(ctx *gin.Context) {
 	var ipas []Ipa
 	ipas, _ = SQLiteGetIpas()
+	user := ctx.Value("user")
+	e := casbin.NewEnforcer("./model.conf", "./policy.csv")
 
+	// Admin rights
+	if e.Enforce(user, "index", "write") {
+		ctx.HTML(http.StatusOK, "index", gin.H{
+			"title":       "IPA Manager",
+			"version":     version,
+			"ipas":        ipas,
+			"admin":       1,
+			"service_url": cfg.Service.Url,
+		},
+		)
+		return
+	}
+
+	// Guest rights
 	ctx.HTML(http.StatusOK, "index", gin.H{
 		"title":       "IPA Manager",
 		"version":     version,
 		"ipas":        ipas,
-		"service_url": cfg.Service.Url,
-	},
-	)
-}
-
-func adminHandler(ctx *gin.Context) {
-	var ipas []Ipa
-	ipas, _ = SQLiteGetIpas()
-
-	ctx.HTML(http.StatusOK, "admin", gin.H{
-		"title":       "IPA Manager",
-		"version":     version,
-		"ipas":        ipas,
+		"admin":       0,
 		"service_url": cfg.Service.Url,
 	},
 	)

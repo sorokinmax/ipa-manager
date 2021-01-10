@@ -1,7 +1,7 @@
 {{define "head"}}
 <style>
     hr{ border: 1px #ccc dashed;}
-    table {
+    table.main {
         text-align:center; 
         width:70%;
         margin-left:auto; 
@@ -40,6 +40,7 @@
 <hr>
 
 {{ $service_url := .service_url }}
+{{ $admin := .admin }}
 
 <table class="main" cellpadding="1" cellspacing="1" >
     <tbody>
@@ -78,12 +79,14 @@
                             <button class="button" type="submit" form="qr-form{{.ID}}" value="qr">Get QR</button>
                         </td>
                     <tr>
+                        {{ if (eq $admin 1) }}
                         <td class="notmain" colspan="2">
                             <form id="remove-form" action="/action/remove" enctype="application/x-www-form-urlencoded" method="post">
                                 <input type="hidden" name="id" value={{.ID}}>
                             </form>
                             <button class="button button-red" type="submit" form="remove-form" value="remove">Delete IPA</button>
                         </td>
+                        {{ end }}
                     </tr>
             </table>
             </td>

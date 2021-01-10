@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -15,12 +16,17 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/sorokinmax/websspi"
 	"howett.net/plist"
 )
 
-const version = "v.1.4.3"
+const version = "v.1.5.0"
 
-var cfg Config
+var (
+	cfg         Config
+	auth        websspi.Authenticator
+	UserInfoKey = "websspi-key-UserInfo"
+)
 
 //Stand stands DB struct
 type Ipa struct {
@@ -56,11 +62,15 @@ func main() {
 
 	router := gin.Default()
 	router.HTMLRender = ginview.Default()
+	config := websspi.NewConfig()
+	auth, err := websspi.New(config)
 
+	router.Use(MidAuth(auth))
+	router.Use(AddUserToCtx())
+	router.StaticFile("favicon.ico", "./views/favicon.ico")
 	router.Use(static.Serve("/ipa", static.LocalFile("./ipa", false)))
 	router.Use(static.Serve("/images", static.LocalFile("./images", false)))
 	router.GET("/", indexHandler)
-	router.GET("/admin", adminHandler)
 	router.GET("/version/:version/", versionHandler)
 	router.POST("/action/qr", qrHandler)
 	router.POST("/action/remove", removeHandler)
@@ -69,6 +79,46 @@ func main() {
 
 	log.Println("Web is available at " + cfg.Service.Url + ":" + strconv.Itoa(cfg.Service.Port))
 	router.Run(":" + strconv.Itoa(cfg.Service.Port))
+}
+
+func AddUserToCtx() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if ctxVars, ok := c.Request.Context().Value(UserInfoKey).(*websspi.UserInfo); ok {
+			c.Set("user", ctxVars.Username)
+		} else {
+			//c.Set("user", "guest")
+			c.Abort()
+			//c.Next()
+			return
+		}
+	}
+}
+
+func MidAuth(a *websspi.Authenticator) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		user, data, err := a.Authenticate(c.Request, c.Writer)
+		if err != nil {
+			a.Return401(c.Writer, data)
+			return
+		}
+
+		// Add the UserInfo value to the reqest's context
+		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), UserInfoKey, user))
+		// and to the request header with key Config.AuthUserKey
+		if a.Config.AuthUserKey != "" {
+			c.Request.Header.Set(a.Config.AuthUserKey, user.Username)
+		}
+
+		// The WWW-Authenticate header might need to be sent back even
+		// on successful authentication (eg. in order to let the client complete
+		// mutual authentication).
+		if data != "" {
+			a.AppendAuthenticateHeader(c.Writer, data)
+		}
+
+		c.Next()
+	}
 }
 
 //ParseIpa : It parses the given ipa and returns a map from the contents of Info.plist in it
