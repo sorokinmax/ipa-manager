@@ -14,5 +14,8 @@ When creating a page with an IPA list, the list is ordered in reverse order by t
 - Installing an IPA using the button from the page
 - Generating a QR code for installing an IPA by pointing the mobile device's camera at the PC monitor screen
 
+### Screenshot
+![Screenshot](/example.png)
+
 ## License
 [MIT](LICENSE)
