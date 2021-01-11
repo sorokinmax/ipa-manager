@@ -20,7 +20,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.2.0.0"
+const version = "v.2.1.0"
 
 var (
 	cfg         Config
@@ -65,12 +65,13 @@ func main() {
 	config := websspi.NewConfig()
 	auth, err := websspi.New(config)
 
-	router.Use(MidAuth(auth))
-	router.Use(AddUserToCtx())
+	//router.Use(MidAuth(auth))
+	//router.Use(AddUserToCtx())
 	router.StaticFile("favicon.ico", "./views/favicon.ico")
 	router.Use(static.Serve("/ipa", static.LocalFile("./ipa", false)))
 	router.Use(static.Serve("/images", static.LocalFile("./images", false)))
 	router.GET("/", indexHandler)
+	router.GET("/admin", MidAuth(auth), AddUserToCtx(), indexHandler)
 	router.GET("/version/:version/", versionHandler)
 	router.POST("/action/qr", qrHandler)
 	router.POST("/action/remove", removeHandler)

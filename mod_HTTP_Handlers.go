@@ -29,20 +29,21 @@ func handlerCustomError(c *gin.Context, err string) {
 func indexHandler(ctx *gin.Context) {
 	var ipas []Ipa
 	ipas, _ = SQLiteGetIpas()
-	user := ctx.Value("user")
 	e := casbin.NewEnforcer("./model.conf", "./policy.csv")
 
 	// Admin rights
-	if e.Enforce(user, "index", "write") {
-		ctx.HTML(http.StatusOK, "index", gin.H{
-			"title":       "IPA Manager",
-			"version":     version,
-			"ipas":        ipas,
-			"admin":       1,
-			"service_url": cfg.Service.Url,
-		},
-		)
-		return
+	if user := ctx.Value("user"); user != nil {
+		if e.Enforce(user, "index", "write") {
+			ctx.HTML(http.StatusOK, "index", gin.H{
+				"title":       "IPA Manager",
+				"version":     version,
+				"ipas":        ipas,
+				"admin":       1,
+				"service_url": cfg.Service.Url,
+			},
+			)
+			return
+		}
 	}
 
 	// Guest rights
