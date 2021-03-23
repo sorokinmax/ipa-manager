@@ -18,9 +18,9 @@ func isError(err error) bool {
 	return (err != nil)
 }
 
-func containsIpas(arr []Ipa, element string) bool {
-	for _, a := range arr {
-		if a.CFBundleVersion == element {
+func containsIpas(ipaArr []Ipa, ipa Ipa) bool {
+	for _, a := range ipaArr {
+		if a.CFBundleVersion == ipa.CFBundleVersion && a.CFBundleIdentifier == ipa.CFBundleIdentifier {
 			return true
 		}
 	}

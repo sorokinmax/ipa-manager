@@ -20,7 +20,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.2.1.0"
+const version = "v.2.1.1"
 
 var (
 	cfg         Config
@@ -176,7 +176,7 @@ func ipaScaner() {
 					ipa.URL = cfg.Service.Url + "/ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion + "/" + distr
 
 					ipas, _ = SQLiteGetIpas()
-					if containsIpas(ipas, ipa.CFBundleVersion) != true {
+					if containsIpas(ipas, ipa) != true {
 						CopyFile(cfg.Paths.Distrs, "./ipa/"+ipa.CFBundleName+"-"+ipa.CFBundleVersion, distr)
 						CopyDir("./images", "./ipa/"+ipa.CFBundleName+"-"+ipa.CFBundleVersion)
 						CreatePlist(ipa)
