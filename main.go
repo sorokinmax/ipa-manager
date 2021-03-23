@@ -28,7 +28,6 @@ var (
 	UserInfoKey = "websspi-key-UserInfo"
 )
 
-//Stand stands DB struct
 type Ipa struct {
 	gorm.Model
 	URL                        string
