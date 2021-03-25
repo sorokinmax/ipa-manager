@@ -25,7 +25,6 @@
         margin: 4px 2px;
         cursor: pointer;
         width: 100%;
-        //border-radius: 8px;
     }
     .button-red {background-color: #f44336;}
     .button-yelow {background-color: #FFD54F;}
@@ -59,10 +58,10 @@
             <td>{{.ipa.CFBundleShortVersionString}}</td>
             <td>{{.ipa.DateTime}}</td>
             <td>
-                <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist'">Install IPA</button>
+                <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist'">Install IPA</button>
                 <form id="qr-form{{.ipa.ID}}" action="/action/qr" enctype="application/x-www-form-urlencoded" method="post">
-                    <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist">
-                    <input type="hidden" name="version" value="{{.ipa.CFBundleVersion}}">
+                    <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist">
+                    <input type="hidden" name="version" value="{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}">
                 </form>
                 <button class="button" type="submit" form="qr-form{{.ipa.ID}}" value="qr">Get QR</button>
             </td>

@@ -100,19 +100,19 @@
             <td>{{.CFBundleIdentifier}}</td>
             <td>{{.CFBundleName}}</td>
             <td>{{.CFBundleDisplayName}}</td>
-            <td><a href=/version/{{.CFBundleVersion}}>{{.CFBundleVersion}}</a></td>
+            <td><a href=/version/{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}>{{.CFBundleVersion}}</a></td>
             <td>{{.CFBundleShortVersionString}}</td>
             <td>{{.DateTime}}</td>
             <td>
                 <table style="width:100%">
                     <tr>
                         <td class="notmain">
-                            <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleVersion}}/{{.CFBundleName}}.plist'">Install IPA</button>
+                            <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}/{{.CFBundleName}}.plist'">Install IPA</button>
                         </td>
                         <td class="notmain">
                             <form id="qr-form{{.ID}}" action="/action/qr" enctype="application/x-www-form-urlencoded" method="post">
-                                <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleVersion}}/{{.CFBundleName}}.plist">
-                                <input type="hidden" name="version" value="{{.CFBundleVersion}}">
+                                <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}/{{.CFBundleName}}.plist">
+                                <input type="hidden" name="version" value="{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}">
                             </form>
                             <button class="button" type="submit" form="qr-form{{.ID}}" value="qr">Get QR</button>
                         </td>

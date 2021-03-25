@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/png"
 	"log"
 	"net/http"
@@ -61,7 +62,7 @@ func removeHandler(ctx *gin.Context) {
 	var ipa Ipa
 	var id = ctx.PostForm("id")
 	ipa, _ = SQLiteGetIpa(id)
-	RemoveDir("./ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion)
+	RemoveDir(fmt.Sprintf(".\\ipa\\%s.%s", ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
 	SQLiteDelIpa(ipa)
 	ctx.Redirect(http.StatusMovedPermanently, cfg.Service.Url)
 	log.Println("Ipa delete has completed")
@@ -69,8 +70,9 @@ func removeHandler(ctx *gin.Context) {
 
 func versionHandler(ctx *gin.Context) {
 	var ipa Ipa
-	var ver = ctx.Param("version")
-	ipa, _ = SQLiteFindIpa(ver)
+	var version = ctx.Param("version")
+
+	ipa, _ = SQLiteFindIpa(version)
 
 	ctx.HTML(http.StatusOK, "version/index", gin.H{
 		"title":       "IPA Manager",

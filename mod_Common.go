@@ -20,7 +20,7 @@ func isError(err error) bool {
 
 func containsIpas(ipaArr []Ipa, ipa Ipa) bool {
 	for _, a := range ipaArr {
-		if a.CFBundleVersion == ipa.CFBundleVersion && a.CFBundleIdentifier == ipa.CFBundleIdentifier {
+		if a.CFBundleVersion == ipa.CFBundleVersion && a.CFBundleShortVersionString == ipa.CFBundleShortVersionString {
 			return true
 		}
 	}

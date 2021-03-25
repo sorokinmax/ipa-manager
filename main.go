@@ -20,7 +20,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.2.1.1"
+const version = "v.2.2.0"
 
 var (
 	cfg         Config
@@ -165,7 +165,7 @@ func ipaScaner() {
 		distrs := filesEnum(cfg.Paths.Distrs)
 		for _, distr := range distrs {
 			if strings.HasSuffix(distr, ".ipa") {
-				ipaInfo, err := parseIpa(cfg.Paths.Distrs + "/" + distr)
+				ipaInfo, err := parseIpa(cfg.Paths.Distrs + "\\" + distr)
 				if err == nil {
 					ipa.CFBundleIdentifier = fmt.Sprint(ipaInfo["CFBundleIdentifier"])
 					ipa.CFBundleName = fmt.Sprint(ipaInfo["CFBundleName"])
@@ -173,19 +173,19 @@ func ipaScaner() {
 					ipa.CFBundleVersion = fmt.Sprint(ipaInfo["CFBundleVersion"])
 					ipa.CFBundleShortVersionString = fmt.Sprint(ipaInfo["CFBundleShortVersionString"])
 					ipa.DateTime = time.Now().Format("2006.01.02 15:04:05")
-					ipa.URL = cfg.Service.Url + "/ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion + "/" + distr
+					ipa.URL = fmt.Sprintf("%s/ipa/%s-%s.%s/%s", cfg.Service.Url, ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, distr)
 
 					ipas, _ = SQLiteGetIpas()
 					if containsIpas(ipas, ipa) != true {
-						CopyFile(cfg.Paths.Distrs, "./ipa/"+ipa.CFBundleName+"-"+ipa.CFBundleVersion, distr)
-						CopyDir("./images", "./ipa/"+ipa.CFBundleName+"-"+ipa.CFBundleVersion)
+						CopyFile(cfg.Paths.Distrs, fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion), distr)
+						CopyDir(".\\images", fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
 						CreatePlist(ipa)
 						SQLiteAddIpa(ipa)
-						deleteFile(cfg.Paths.Distrs + "/" + distr)
-						log.Printf("IPA %s is added\n", ipa.CFBundleVersion)
+						deleteFile(cfg.Paths.Distrs + "\\" + distr)
+						log.Printf("IPA %s is added\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
 					} else {
-						log.Printf("IPA %s is already exist\n", ipa.CFBundleVersion)
-						deleteFile(cfg.Paths.Distrs + "/" + distr)
+						log.Printf("IPA %s is already exist\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
+						deleteFile(cfg.Paths.Distrs + "\\" + distr)
 					}
 				}
 			}
