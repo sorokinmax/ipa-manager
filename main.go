@@ -20,7 +20,7 @@ import (
 	"howett.net/plist"
 )
 
-const version = "v.2.2.0"
+const version = "v.2.2.0 (bsvs+bv mod)"
 
 var (
 	cfg         Config
