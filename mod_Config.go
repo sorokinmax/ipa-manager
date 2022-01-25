@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,13 +26,6 @@ func readConfigFile(cfg *Config) {
 
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func readConfigEnv(cfg *Config) {
-	err := envconfig.Process("", cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"image/png"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/casbin/casbin"
 	"github.com/gin-gonic/gin"
@@ -13,19 +14,6 @@ import (
 	"github.com/boombuler/barcode/qr"
 	"github.com/fogleman/gg"
 )
-
-func handlerError(c *gin.Context, err error) bool {
-	if err != nil {
-		c.Error(err)
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{"status": "Error", "message": err.Error()})
-		return true
-	}
-	return false
-}
-
-func handlerCustomError(c *gin.Context, err string) {
-	c.AbortWithStatusJSON(http.StatusOK, gin.H{"status": "Error", "message": err})
-}
 
 func indexHandler(ctx *gin.Context) {
 	var ipas []Ipa
@@ -108,4 +96,26 @@ func qrHandler(ctx *gin.Context) {
 	png.Encode(ctx.Writer, dc.Image())
 
 	ctx.String(http.StatusOK, "Done")
+}
+
+func postIpaHandler(ctx *gin.Context) {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !strings.HasSuffix(file.Filename, ".ipa") {
+		ctx.JSON(http.StatusBadRequest, gin.H{"responce": "Invalid file extension"})
+		return
+	}
+
+	log.Println(file.Filename)
+
+	err = ctx.SaveUploadedFile(file, "./temp/"+file.Filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ipaProcessor("./temp", file.Filename)
+
+	ctx.JSON(http.StatusOK, gin.H{"responce": "File processed"})
 }

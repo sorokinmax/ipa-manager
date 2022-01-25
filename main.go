@@ -1,43 +1,25 @@
 package main
 
 import (
-	"archive/zip"
 	"context"
-	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/sorokinmax/websspi"
-	"howett.net/plist"
 )
 
-const version = "v.2.2.0 (bsvs+bv mod)"
+const version = "v.2.3.0"
 
 var (
 	cfg         Config
 	auth        websspi.Authenticator
 	UserInfoKey = "websspi-key-UserInfo"
 )
-
-type Ipa struct {
-	gorm.Model
-	URL                        string
-	DateTime                   string
-	CFBundleIdentifier         string
-	CFBundleName               string
-	CFBundleDisplayName        string
-	CFBundleVersion            string
-	CFBundleShortVersionString string
-}
 
 func main() {
 
@@ -62,7 +44,7 @@ func main() {
 	router := gin.Default()
 	router.HTMLRender = ginview.Default()
 	config := websspi.NewConfig()
-	auth, err := websspi.New(config)
+	auth, _ := websspi.New(config)
 
 	//router.Use(MidAuth(auth))
 	//router.Use(AddUserToCtx())
@@ -74,6 +56,7 @@ func main() {
 	router.GET("/version/:version/", versionHandler)
 	router.POST("/action/qr", qrHandler)
 	router.POST("/action/remove", removeHandler)
+	router.POST("/action/ipa", postIpaHandler)
 
 	go ipaScaner()
 
@@ -118,77 +101,5 @@ func MidAuth(a *websspi.Authenticator) gin.HandlerFunc {
 		}
 
 		c.Next()
-	}
-}
-
-//ParseIpa : It parses the given ipa and returns a map from the contents of Info.plist in it
-func parseIpa(name string) (map[string]interface{}, error) {
-	r, err := zip.OpenReader(name)
-	if err != nil {
-		log.Println("Error opening ipa/zip ", err.Error())
-		return nil, err
-	}
-	defer r.Close()
-
-	for _, file := range r.File {
-		if strings.HasSuffix(file.Name, ".app/Info.plist") {
-			rc, err := file.Open()
-			if err != nil {
-				log.Println("Error opening Info.plist in zip", err.Error())
-				return nil, err
-			}
-			buf := make([]byte, file.FileInfo().Size())
-			_, err = io.ReadFull(rc, buf)
-			if err != nil {
-				log.Println("Error reading Info.plist", err.Error())
-				return nil, err
-			}
-			var info_map map[string]interface{}
-			_, err = plist.Unmarshal(buf, &info_map)
-			if err != nil {
-				log.Println("Error reading Info.plist", err.Error())
-				return nil, err
-			}
-			return info_map, nil
-		}
-	}
-	return nil, errors.New("Info.plist not found")
-}
-
-func ipaScaner() {
-	var ipas []Ipa
-	var ipa Ipa
-
-	ticker := time.NewTicker(1 * time.Second)
-
-	for range ticker.C {
-		distrs := filesEnum(cfg.Paths.Distrs)
-		for _, distr := range distrs {
-			if strings.HasSuffix(distr, ".ipa") {
-				ipaInfo, err := parseIpa(cfg.Paths.Distrs + "\\" + distr)
-				if err == nil {
-					ipa.CFBundleIdentifier = fmt.Sprint(ipaInfo["CFBundleIdentifier"])
-					ipa.CFBundleName = fmt.Sprint(ipaInfo["CFBundleName"])
-					ipa.CFBundleDisplayName = fmt.Sprint(ipaInfo["CFBundleDisplayName"])
-					ipa.CFBundleVersion = fmt.Sprint(ipaInfo["CFBundleVersion"])
-					ipa.CFBundleShortVersionString = fmt.Sprint(ipaInfo["CFBundleShortVersionString"])
-					ipa.DateTime = time.Now().Format("2006.01.02 15:04:05")
-					ipa.URL = fmt.Sprintf("%s/ipa/%s-%s.%s/%s", cfg.Service.Url, ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, distr)
-
-					ipas, _ = SQLiteGetIpas()
-					if containsIpas(ipas, ipa) != true {
-						CopyFile(cfg.Paths.Distrs, fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion), distr)
-						CopyDir(".\\images", fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
-						CreatePlist(ipa)
-						SQLiteAddIpa(ipa)
-						deleteFile(cfg.Paths.Distrs + "\\" + distr)
-						log.Printf("IPA %s is added\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
-					} else {
-						log.Printf("IPA %s is already exist\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
-						deleteFile(cfg.Paths.Distrs + "\\" + distr)
-					}
-				}
-			}
-		}
 	}
 }
