@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"regexp"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -82,9 +83,13 @@ func SQLiteFindIpa(version string) (Ipa, error) {
 	}
 	defer db.Close()
 
+	re := regexp.MustCompile("([0-9]+.[0-9]+.[0-9]+).([0-9]+)")
+	CFBundleShortVersionString := re.FindStringSubmatch(version)[1]
+	CFBundleVersion := re.FindStringSubmatch(version)[2]
+
 	// Find all of our users.
 	var ipa Ipa
-	db.Where("cf_bundle_version = ?", version).Find(&ipa)
+	db.Where("cf_bundle_version = ?", CFBundleVersion).Where("cf_bundle_short_version_string = ?", CFBundleShortVersionString).Find(&ipa)
 
 	return ipa, nil
 }

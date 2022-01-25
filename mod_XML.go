@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/beevik/etree"
@@ -27,7 +28,7 @@ func CreatePlist(ipa Ipa) bool {
 	el = doc.FindElement("//string[4]")
 	el.SetText(ipa.CFBundleName)
 
-	doc.WriteToFile("./ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion + "/" + ipa.CFBundleName + ".plist")
+	doc.WriteToFile(fmt.Sprintf(".\\ipa\\%s-%s.%s\\%s.plist", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, ipa.CFBundleName))
 	return true
 }
 
