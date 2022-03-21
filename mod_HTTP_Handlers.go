@@ -18,6 +18,10 @@ import (
 func indexHandler(ctx *gin.Context) {
 	var ipas []Ipa
 	ipas, _ = SQLiteGetIpas()
+	for id, ipa := range ipas {
+		ipas[id].URL = fmt.Sprintf("%s/ipa/%s/%s", cfg.Service.Url, ipa.SHA256, ipa.FileName)
+	}
+
 	e := casbin.NewEnforcer("./model.conf", "./policy.csv")
 
 	// Admin rights
@@ -50,7 +54,7 @@ func removeHandler(ctx *gin.Context) {
 	var ipa Ipa
 	var id = ctx.PostForm("id")
 	ipa, _ = SQLiteGetIpa(id)
-	RemoveDir(fmt.Sprintf(".\\ipa\\%s.%s", ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
+	RemoveDir(fmt.Sprintf(".\\ipa\\%s", ipa.SHA256))
 	SQLiteDelIpa(ipa)
 	ctx.Redirect(http.StatusMovedPermanently, cfg.Service.Url)
 	log.Println("Ipa delete has completed")
@@ -58,13 +62,13 @@ func removeHandler(ctx *gin.Context) {
 
 func versionHandler(ctx *gin.Context) {
 	var ipa Ipa
-	var version = ctx.Param("version")
+	var sha256 = ctx.Param("sha256")
 
-	ipa, _ = SQLiteFindIpa(version)
+	ipa, _ = SQLiteFindIpa(sha256)
+	ipa.URL = fmt.Sprintf("%s/ipa/%s/%s", cfg.Service.Url, ipa.SHA256, ipa.FileName)
 
 	ctx.HTML(http.StatusOK, "version/index", gin.H{
 		"title":       "IPA Manager",
-		"version":     version,
 		"ipa":         ipa,
 		"service_url": cfg.Service.Url,
 	},
@@ -73,7 +77,8 @@ func versionHandler(ctx *gin.Context) {
 
 func qrHandler(ctx *gin.Context) {
 	dataString := ctx.PostForm("url")
-	version := ctx.PostForm("version")
+	CFBundleIdentifier := ctx.PostForm("CFBundleIdentifier")
+	version := CFBundleIdentifier + " - " + ctx.PostForm("version")
 
 	qrCode, _ := qr.Encode(dataString, qr.L, qr.Auto)
 	qrCode, _ = barcode.Scale(qrCode, 600, 600)
@@ -108,7 +113,7 @@ func postIpaHandler(ctx *gin.Context) {
 		return
 	}
 
-	log.Println(file.Filename)
+	//log.Println(file.Filename)
 
 	err = ctx.SaveUploadedFile(file, "./temp/"+file.Filename)
 	if err != nil {

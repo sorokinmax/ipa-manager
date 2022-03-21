@@ -88,31 +88,32 @@
             <th>Bundle Identifier</th>
             <th>Bundle Name</th>
             <th>Bundle Display Name</th>
-            <th>Bundle Version</th>
             <th>Bundle Short Version</th>
+            <th>Bundle Version</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         {{range .ipas}}
         <tr>
             <td>{{.ID}}</td>
-            <td><a href={{.URL}}>{{.URL}}</a></td>
+            <td><a href={{.URL}}>{{.FileName}}</a></td>
             <td>{{.CFBundleIdentifier}}</td>
             <td>{{.CFBundleName}}</td>
             <td>{{.CFBundleDisplayName}}</td>
-            <td><a href=/version/{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}>{{.CFBundleVersion}}</a></td>
             <td>{{.CFBundleShortVersionString}}</td>
+            <td><a href=/version/{{.SHA256}}>{{.CFBundleVersion}}</a></td>
             <td>{{.DateTime}}</td>
             <td>
                 <table style="width:100%">
                     <tr>
                         <td class="notmain">
-                            <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}/{{.CFBundleName}}.plist'">Install IPA</button>
+                            <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.SHA256}}/{{.CFBundleName}}.plist'">Install IPA</button>
                         </td>
                         <td class="notmain">
                             <form id="qr-form{{.ID}}" action="/action/qr" enctype="application/x-www-form-urlencoded" method="post">
-                                <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.CFBundleName}}-{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}/{{.CFBundleName}}.plist">
+                                <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{$service_url}}/ipa/{{.SHA256}}/{{.CFBundleName}}.plist">
                                 <input type="hidden" name="version" value="{{.CFBundleShortVersionString}}.{{.CFBundleVersion}}">
+                                <input type="hidden" name="CFBundleIdentifier" value="{{.CFBundleIdentifier}}">
                             </form>
                             <button class="button" type="submit" form="qr-form{{.ID}}" value="qr">Get QR</button>
                         </td>

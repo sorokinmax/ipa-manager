@@ -43,25 +43,26 @@
             <th>Bundle Identifier</th>
             <th>Bundle Name</th>
             <th>Bundle Display Name</th>
-            <th>Bundle Version</th>
             <th>Bundle Short Version</th>
+            <th>Bundle Version</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         <tr>
             <td>{{.ipa.ID}}</td>
-            <td><a href={{.ipa.URL}}>{{.ipa.URL}}</a></td>
+            <td><a href={{.ipa.URL}}>{{.ipa.FileName}}</a></td>
             <td>{{.ipa.CFBundleIdentifier}}</td>
             <td>{{.ipa.CFBundleName}}</td>
             <td>{{.ipa.CFBundleDisplayName}}</td>
-            <td>{{.ipa.CFBundleVersion}}</td>
             <td>{{.ipa.CFBundleShortVersionString}}</td>
+            <td>{{.ipa.CFBundleVersion}}</td>
             <td>{{.ipa.DateTime}}</td>
             <td>
-                <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist'">Install IPA</button>
+                <button class="button" onClick="parent.location='itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.SHA256}}/{{.ipa.CFBundleName}}.plist'">Install IPA</button>
                 <form id="qr-form{{.ipa.ID}}" action="/action/qr" enctype="application/x-www-form-urlencoded" method="post">
-                    <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.CFBundleName}}-{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}/{{.ipa.CFBundleName}}.plist">
+                    <input type="hidden" name="url" value="itms-services://?action=download-manifest&url={{.service_url}}/ipa/{{.ipa.SHA256}}/{{.ipa.CFBundleName}}.plist">
                     <input type="hidden" name="version" value="{{.ipa.CFBundleShortVersionString}}.{{.ipa.CFBundleVersion}}">
+                    <input type="hidden" name="CFBundleIdentifier" value="{{.ipa.CFBundleIdentifier}}">
                 </form>
                 <button class="button" type="submit" form="qr-form{{.ipa.ID}}" value="qr">Get QR</button>
             </td>

@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"regexp"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -61,48 +60,38 @@ func SQLiteSaveIpa(ipa Ipa) error {
 }
 
 func SQLiteGetIpa(id string) (Ipa, error) {
-
 	db, err := gorm.Open("sqlite3", "./ipa.db")
 	if err != nil {
 		panic("Failed to open the SQLite database.")
 	}
 	defer db.Close()
 
-	// Find all of our users.
 	var ipa Ipa
 	db.Where("id = ?", id).Find(&ipa)
 
 	return ipa, nil
 }
 
-func SQLiteFindIpa(version string) (Ipa, error) {
-
+func SQLiteFindIpa(sha256 string) (Ipa, error) {
 	db, err := gorm.Open("sqlite3", "./ipa.db")
 	if err != nil {
 		panic("Failed to open the SQLite database.")
 	}
 	defer db.Close()
 
-	re := regexp.MustCompile("([0-9]+.[0-9]+.[0-9]+).([0-9]+)")
-	CFBundleShortVersionString := re.FindStringSubmatch(version)[1]
-	CFBundleVersion := re.FindStringSubmatch(version)[2]
-
-	// Find all of our users.
 	var ipa Ipa
-	db.Where("cf_bundle_version = ?", CFBundleVersion).Where("cf_bundle_short_version_string = ?", CFBundleShortVersionString).Find(&ipa)
+	db.Where("sha256 = ?", sha256).Find(&ipa)
 
 	return ipa, nil
 }
 
 func SQLiteGetIpas() ([]Ipa, error) {
-
 	db, err := gorm.Open("sqlite3", "./ipa.db")
 	if err != nil {
 		panic("Failed to open the SQLite database.")
 	}
 	defer db.Close()
 
-	// Find all of our users.
 	var ipas []Ipa
 	db.Order("date_time desc").Find(&ipas)
 

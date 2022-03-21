@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -15,13 +16,15 @@ import (
 
 type Ipa struct {
 	gorm.Model
-	URL                        string
+	URL                        string //`gorm:"-"`
+	FileName                   string
 	DateTime                   string
 	CFBundleIdentifier         string
 	CFBundleName               string
 	CFBundleDisplayName        string
 	CFBundleVersion            string
 	CFBundleShortVersionString string
+	SHA256                     string
 }
 
 //ParseIpa : It parses the given ipa and returns a map from the contents of Info.plist in it
@@ -86,20 +89,55 @@ func ipaProcessor(dirPath string, fileName string) {
 		ipa.CFBundleVersion = fmt.Sprint(ipaInfo["CFBundleVersion"])
 		ipa.CFBundleShortVersionString = fmt.Sprint(ipaInfo["CFBundleShortVersionString"])
 		ipa.DateTime = time.Now().Format("2006.01.02 15:04:05")
-		ipa.URL = fmt.Sprintf("%s/ipa/%s-%s.%s/%s", cfg.Service.Url, ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, fileName)
+		ipa.SHA256 = getSHA256(filePath)
+		ipa.FileName = fileName
 
 		ipas, _ = SQLiteGetIpas()
 		if !containsIpas(ipas, ipa) {
-			CopyFile(dirPath, fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion), fileName)
-			CopyDir(".\\images", fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
+			CopyFile(dirPath, fmt.Sprintf(".\\ipa\\%s", ipa.SHA256), fileName)
+			CopyDir(".\\images", fmt.Sprintf(".\\ipa\\%s", ipa.SHA256))
 			CreatePlist(ipa)
 			SQLiteAddIpa(ipa)
 			deleteFile(filePath)
-			log.Printf("IPA %s is added\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
+			log.Printf("IPA %s is added\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleIdentifier, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
 		} else {
-			log.Printf("IPA %s is already exist\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
+			log.Printf("IPA %s is already exist\n", fmt.Sprintf("%s-%s.%s", ipa.CFBundleIdentifier, ipa.CFBundleShortVersionString, ipa.CFBundleVersion))
 			deleteFile(filePath)
 		}
 	}
 
+}
+
+func ipaMigrator() {
+	var ipas []Ipa
+
+	saveTrigger := false
+
+	ipas, _ = SQLiteGetIpas()
+	for _, ipa := range ipas {
+		// convert URL to fileName
+		if ipa.FileName == "" && ipa.URL != "" {
+			ipa.FileName = ipa.URL[strings.LastIndex(ipa.URL, "/")+1:]
+			ipa.URL = ""
+			saveTrigger = true
+		}
+
+		// set sha256 and FileName
+		if ipa.SHA256 == "" {
+			filePath := fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion)
+			ipa.SHA256 = getSHA256(filePath + "\\" + ipa.FileName)
+			saveTrigger = true
+		}
+
+		// rename dirs
+		fixPath := fmt.Sprintf(".\\ipa\\%s-%s.%s", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion)
+		if _, err := os.Stat(fixPath); !os.IsNotExist(err) {
+			newPath := fmt.Sprintf(".\\ipa\\%s", ipa.SHA256)
+			RenameFile(fixPath, newPath)
+			saveTrigger = true
+		}
+		if saveTrigger {
+			SQLiteSaveIpa(ipa)
+		}
+	}
 }

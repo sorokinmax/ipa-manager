@@ -2,8 +2,12 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"golang.org/x/text/encoding/charmap"
@@ -20,7 +24,7 @@ func isError(err error) bool {
 
 func containsIpas(ipaArr []Ipa, ipa Ipa) bool {
 	for _, a := range ipaArr {
-		if a.CFBundleVersion == ipa.CFBundleVersion && a.CFBundleShortVersionString == ipa.CFBundleShortVersionString {
+		if a.SHA256 == ipa.SHA256 {
 			return true
 		}
 	}
@@ -135,3 +139,24 @@ func Convert(i int, s []byte) string {
 
 	return string(d)
 }
+
+func getSHA256(filePath string) string {
+	f, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		log.Fatal(err)
+	}
+
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+/*
+func getIpasRoot() string {
+	return fmt.Sprintf("%s/ipa/", cfg.Service.Url, ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, "fileName")
+}
+*/

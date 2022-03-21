@@ -24,3 +24,4 @@ output.log
 web.log
 __debug_bin
 *.log
+*.db

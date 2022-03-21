@@ -117,3 +117,11 @@ func CopyDir(src string, dst string) bool {
 	exec.Command("robocopy", args...).Output()
 	return true
 }
+
+func RenameFile(RenameFile string, newName string) error {
+	err := os.Rename(RenameFile, newName)
+	if err != nil {
+		return err
+	}
+	return nil
+}

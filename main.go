@@ -13,11 +13,11 @@ import (
 	"github.com/sorokinmax/websspi"
 )
 
-const version = "v.2.3.0"
+const version = "v.2.3.1"
 
 var (
-	cfg         Config
-	auth        websspi.Authenticator
+	cfg Config
+	//auth        websspi.Authenticator
 	UserInfoKey = "websspi-key-UserInfo"
 )
 
@@ -40,6 +40,7 @@ func main() {
 	readConfigFile(&cfg)
 
 	SQLiteCreateDB(Ipa{})
+	//ipaMigrator()
 
 	router := gin.Default()
 	router.HTMLRender = ginview.Default()
@@ -53,7 +54,7 @@ func main() {
 	router.Use(static.Serve("/images", static.LocalFile("./images", false)))
 	router.GET("/", indexHandler)
 	router.GET("/admin", MidAuth(auth), AddUserToCtx(), indexHandler)
-	router.GET("/version/:version/", versionHandler)
+	router.GET("/version/:sha256/", versionHandler)
 	router.POST("/action/qr", qrHandler)
 	router.POST("/action/remove", removeHandler)
 	router.POST("/action/ipa", postIpaHandler)
