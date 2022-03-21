@@ -16,7 +16,7 @@ import (
 
 type Ipa struct {
 	gorm.Model
-	URL                        string //`gorm:"-"`
+	URL                        string `gorm:"-"`
 	FileName                   string
 	DateTime                   string
 	CFBundleIdentifier         string
@@ -91,6 +91,7 @@ func ipaProcessor(dirPath string, fileName string) {
 		ipa.DateTime = time.Now().Format("2006.01.02 15:04:05")
 		ipa.SHA256 = getSHA256(filePath)
 		ipa.FileName = fileName
+		ipa.URL = fmt.Sprintf("%s/ipa/%s/%s", cfg.Service.Url, ipa.SHA256, ipa.FileName)
 
 		ipas, _ = SQLiteGetIpas()
 		if !containsIpas(ipas, ipa) {

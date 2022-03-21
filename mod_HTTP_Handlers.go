@@ -23,9 +23,11 @@ func indexHandler(ctx *gin.Context) {
 	}
 
 	e := casbin.NewEnforcer("./model.conf", "./policy.csv")
+	//log.Println(ctx.Value("user"))
 
 	// Admin rights
 	if user := ctx.Value("user"); user != nil {
+
 		if e.Enforce(user, "index", "write") {
 			ctx.HTML(http.StatusOK, "index", gin.H{
 				"title":       "IPA Manager",

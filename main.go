@@ -13,7 +13,7 @@ import (
 	"github.com/sorokinmax/websspi"
 )
 
-const version = "v.2.3.1"
+const version = "v.2.3.3"
 
 var (
 	cfg Config

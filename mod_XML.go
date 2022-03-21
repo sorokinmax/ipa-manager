@@ -14,10 +14,10 @@ func CreatePlist(ipa Ipa) bool {
 	el.SetText(ipa.URL)
 
 	el = doc.FindElement("//dict[2]/string[2]")
-	el.SetText(cfg.Service.Url + "/ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion + "/display-image.png")
+	el.SetText(cfg.Service.Url + "/ipa/" + ipa.SHA256 + "/display-image.png")
 
 	el = doc.FindElement("//dict[3]/string[2]")
-	el.SetText(cfg.Service.Url + "/ipa/" + ipa.CFBundleName + "-" + ipa.CFBundleVersion + "/full-size-image.png")
+	el.SetText(cfg.Service.Url + "/ipa/" + ipa.SHA256 + "/full-size-image.png")
 
 	el = doc.FindElement("//dict[1]/dict[1]/string[1]")
 	el.SetText(ipa.CFBundleIdentifier)
@@ -28,7 +28,7 @@ func CreatePlist(ipa Ipa) bool {
 	el = doc.FindElement("//string[4]")
 	el.SetText(ipa.CFBundleName)
 
-	doc.WriteToFile(fmt.Sprintf(".\\ipa\\%s-%s.%s\\%s.plist", ipa.CFBundleName, ipa.CFBundleShortVersionString, ipa.CFBundleVersion, ipa.CFBundleName))
+	doc.WriteToFile(fmt.Sprintf(".\\ipa\\%s\\%s.plist", ipa.SHA256, ipa.CFBundleName))
 	return true
 }
 
